@@ -1,6 +1,7 @@
 builds:
   - env:
       - CGO_ENABLED=0
+    main: ./cmd/pingtunnel/main.go
     ldflags:
       - -s -w
     goos:
@@ -15,6 +16,11 @@ builds:
     goarm:
       - 6
       - 7
+    ignore:
+      - goos: darwin
+        goarch: arm
+      - goos: freebsd
+        goarch: arm64
 archives:
   - format: gz
     files:
