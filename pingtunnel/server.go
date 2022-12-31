@@ -76,7 +76,7 @@ type ServerConn struct {
 
 func (p *Server) Run() error {
 
-	conn, err := icmp.ListenPacket("ip4:icmp", "")
+	conn, err := icmp.ListenPacket("ip6:ipv6-icmp", "")
 	if err != nil {
 		loggo.Error("Error listening for ICMP packets: %s", err.Error())
 		return err
@@ -182,7 +182,7 @@ func (p *Server) processDataPacketNewConn(id string, packet *Packet) *ServerConn
 
 	if packet.my.Tcpmode > 0 {
 
-		c, err := net.DialTimeout("tcp", addr, time.Millisecond*time.Duration(p.connecttmeout))
+		c, err := net.DialTimeout("tcp6", addr, time.Millisecond*time.Duration(p.connecttmeout))
 		if err != nil {
 			loggo.Error("Error listening for tcp packets: %s %s", id, err.Error())
 			p.remoteError(packet.echoId, packet.echoSeq, id, (int)(packet.my.Rproto), packet.src)
@@ -205,7 +205,7 @@ func (p *Server) processDataPacketNewConn(id string, packet *Packet) *ServerConn
 
 	} else {
 
-		c, err := net.DialTimeout("udp", addr, time.Millisecond*time.Duration(p.connecttmeout))
+		c, err := net.DialTimeout("udp6", addr, time.Millisecond*time.Duration(p.connecttmeout))
 		if err != nil {
 			loggo.Error("Error listening for udp packets: %s %s", id, err.Error())
 			p.remoteError(packet.echoId, packet.echoSeq, id, (int)(packet.my.Rproto), packet.src)
