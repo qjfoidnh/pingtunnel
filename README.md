@@ -1,23 +1,10 @@
-# Pingtunnel
+# Pingtunnel-v6
 
-[<img src="https://img.shields.io/github/license/esrrhs/pingtunnel">](https://github.com/esrrhs/pingtunnel)
-[<img src="https://img.shields.io/github/languages/top/esrrhs/pingtunnel">](https://github.com/esrrhs/pingtunnel)
-[![Go Report Card](https://goreportcard.com/badge/github.com/esrrhs/pingtunnel)](https://goreportcard.com/report/github.com/esrrhs/pingtunnel)
-[<img src="https://img.shields.io/github/v/release/esrrhs/pingtunnel">](https://github.com/esrrhs/pingtunnel/releases)
-[<img src="https://img.shields.io/github/downloads/esrrhs/pingtunnel/total">](https://github.com/esrrhs/pingtunnel/releases)
-[<img src="https://img.shields.io/docker/pulls/esrrhs/pingtunnel">](https://hub.docker.com/repository/docker/esrrhs/pingtunnel)
-[<img src="https://img.shields.io/github/workflow/status/esrrhs/pingtunnel/Go">](https://github.com/esrrhs/pingtunnel/actions)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a200bca59d1b4ca7a9c2cdb564508b47)](https://www.codacy.com/manual/esrrhs/pingtunnel?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=esrrhs/pingtunnel&amp;utm_campaign=Badge_Grade)
+修改自[https://github.com/cxjava/pingtunnel][pingtunnel]
 
 pingtunnel是把tcp/udp/sock5流量伪装成icmp流量进行转发的工具。用于突破网络封锁，或是绕过WIFI网络的登陆验证，或是在某些网络加快网络传输速度。
+pingtunnel-v6为原版pingtunnel的ipv6协议版本，不支持ipv4
 
-[Readme EN](./README_EN.md)
-
-**注意：本工具只是用作学习研究，请勿用于非法用途！**
-
-**有问题可以加QQ群交流：1023345068**
-
-![image](network.jpg)
 
 # 功能
 * 某些服务器的tcp、udp流量被禁止，可以通过pingtunnel绕过。
@@ -25,32 +12,29 @@ pingtunnel是把tcp/udp/sock5流量伪装成icmp流量进行转发的工具。�
 * 某些网络，tcp、udp传输很慢，可以通过pingtunnel加速网络。
 
 # 使用
-### 安装服务端
-* 首先准备好一个具有公网ip的服务器，如AWS上的EC2，假定域名或者公网ip是www.yourserver.com
-* 从[releases](https://github.com/esrrhs/pingtunnel/releases)下载对应的安装包，如pingtunnel_linux64.zip，然后解压，以**root**权限执行
+### 编译
 ```
-sudo wget (最新release的下载链接)
-sudo unzip pingtunnel_linux64.zip
+git clone https://github.com/qjfoidnh/pingtunnel.git
+cd pingtunnel &&  go build -o pingtunnel cmd/pingtunnel/main.go
+```
+
+### 安装服务端
+* 准备好一个具有公网ipv6的服务器，如AWS上的EC2，假定域名或者公网ip是www.yourserver.com。将编译出的的可执行文件传到服务器上
+```
 sudo ./pingtunnel -type server
 ```
-* (可选)关闭系统默认的ping
+* (可选)关闭系统默认的v6 ping，低版本内核可能不支持
 ```
-echo 1 >/proc/sys/net/ipv4/icmp_echo_ignore_all
+echo 1 >/proc/sys/net/ipv6/icmp/echo_ignore_all
 ```
-### 安装GUI客户端(新手推荐)
-* 从[pingtunnel-qt](https://github.com/esrrhs/pingtunnel-qt)下载qt的gui版本
-* 双击exe运行，修改server（如www.yourserver.com）、listen port（如1080），勾上sock5，其他设置默认即可，然后点击*GO*
-* 一切正常，界面上会有ping值显示，然后可点击X隐藏到状态栏
-* 设置浏览器的sock5代理到127.0.0.1:1080，如果连不上网，出现socks version not supported错误日志，说明浏览器的代理不是socks5代理。如果提示非安全连接，说明dns有问题，勾上浏览器的【使用socks5代理DNS查询】，或者参考[yellowdns](https://github.com/esrrhs/yellowdns)
-
-![image](qtrun.jpg)
 
 ### 安装客户端(高玩推荐)
-* 从[releases](https://github.com/esrrhs/pingtunnel/releases)下载对应的安装包，如pingtunnel_windows64.zip，解压
+* 将编译出的可执行文件传到客户机
 * 然后用**管理员权限**运行，不同的转发功能所对应的命令如下
 * 如果看到有ping pong的log，说明连接正常
 ##### 转发sock5
 ```
+# 如果使用ip地址，地址需要用[]括起来
 pingtunnel.exe -type client -l :4455 -s www.yourserver.com -sock5 1
 ```
 ##### 转发tcp
@@ -61,40 +45,6 @@ pingtunnel.exe -type client -l :4455 -s www.yourserver.com -t www.yourserver.com
 ```
 pingtunnel.exe -type client -l :4455 -s www.yourserver.com -t www.yourserver.com:4455
 ```
-
-### Docker
-server:
-```
-docker run --name pingtunnel-server -d --privileged --network host --restart=always esrrhs/pingtunnel ./pingtunnel -type server -key 123456
-```
-client:
-```
-docker run --name pingtunnel-client -d --restart=always -p 1080:1080 esrrhs/pingtunnel ./pingtunnel -type client -l :1080 -s www.yourserver.com -sock5 1 -key 123456
-```
-
-# 效果
-测试pingtunnel的加速效果，服务器位于bandwagon北美，客户端位于中国大陆的阿里云。
-
-下载centos镜像 [centos mirror](http://mirror.calgah.com/centos/8/isos/x86_64/CentOS-8.1.1911-x86_64-dvd1.iso) 
-直接wget、通过shadowsocks wget、通过kcptun wget、通过pingtunnel wget的结果如下。
-
-|              | wget     | shaowsocks | kcptun | pingtunnel |
-|--------------|----------|------------|------------|------------|
-| 阿里云 | 26.6KB/s | 31.8KB/s   | 606KB/s    |5.64MB/s|
-
-可以看到加速效果基本上**200倍**。
-
-# 下载
-cmd: https://github.com/esrrhs/pingtunnel/releases
-
-QT GUI: https://github.com/esrrhs/pingtunnel-qt
-
-# Stargazers over time
-
-[![Stargazers over time](https://starchart.cc/esrrhs/pingtunnel.svg)](https://starchart.cc/esrrhs/pingtunnel)
-     
-# 其他
-可用于路由器上，参考[yellowsocks](https://github.com/esrrhs/yellowsocks)的使用
      
 # Usage
     通过伪造ping，把tcp/udp/sock5流量通过远程服务器转发到目的服务器上。用于突破某些运营商封锁TCP/UDP流量。
@@ -170,4 +120,3 @@ QT GUI: https://github.com/esrrhs/pingtunnel-qt
     -s5filter sock5模式设置转发过滤，默认全转发，设置CN代表CN地区的直连不转发
 
     -s5ftfile sock5模式转发过滤的数据文件，默认读取当前目录的GeoLite2-Country.mmdb
-
