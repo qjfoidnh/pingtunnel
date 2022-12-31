@@ -16,8 +16,8 @@ import (
 )
 
 const (
-	SEND_PROTO int = 8
-	RECV_PROTO int = 0
+	SEND_PROTO int = 128
+	RECV_PROTO int = 129
 )
 
 func NewClient(addr string, server string, target string, timeout int, key int,
@@ -29,18 +29,18 @@ func NewClient(addr string, server string, target string, timeout int, key int,
 	var err error
 
 	if tcpmode > 0 {
-		tcpaddr, err = net.ResolveTCPAddr("tcp", addr)
+		tcpaddr, err = net.ResolveTCPAddr("tcp6", addr)
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		ipaddr, err = net.ResolveUDPAddr("udp", addr)
+		ipaddr, err = net.ResolveUDPAddr("udp6", addr)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	ipaddrServer, err := net.ResolveIPAddr("ip", server)
+	ipaddrServer, err := net.ResolveIPAddr("ip6", server)
 	if err != nil {
 		return nil, err
 	}
@@ -184,7 +184,7 @@ func (p *Client) LocalAddrToConnMapSize() int {
 
 func (p *Client) Run() error {
 
-	conn, err := icmp.ListenPacket("ip4:icmp", "")
+	conn, err := icmp.ListenPacket("ip6:ipv6-icmp", "")
 	if err != nil {
 		loggo.Error("Error listening for ICMP packets: %s", err.Error())
 		return err
@@ -192,14 +192,14 @@ func (p *Client) Run() error {
 	p.conn = conn
 
 	if p.tcpmode > 0 {
-		tcplistenConn, err := net.ListenTCP("tcp", p.tcpaddr)
+		tcplistenConn, err := net.ListenTCP("tcp6", p.tcpaddr)
 		if err != nil {
 			loggo.Error("Error listening for tcp packets: %s", err.Error())
 			return err
 		}
 		p.tcplistenConn = tcplistenConn
 	} else {
-		listener, err := net.ListenUDP("udp", p.ipaddr)
+		listener, err := net.ListenUDP("udp6", p.ipaddr)
 		if err != nil {
 			loggo.Error("Error listening for udp packets: %s", err.Error())
 			return err
@@ -677,7 +677,7 @@ func (p *Client) ping() {
 		SEND_PROTO, RECV_PROTO, p.key,
 		0, 0, 0, 0, 0, 0,
 		0)
-	loggo.Info("ping %s %s %d %d %d %d", p.addrServer, now.String(), p.sproto, p.rproto, p.id, p.sequence)
+	loggo.Info("ping %s %s %d %d %d %d", p.ipaddrServer, now.String(), p.sproto, p.rproto, p.id, p.sequence)
 	p.sequence++
 	if now.Sub(p.pongTime) > time.Second*3 {
 		p.rtt = 0
