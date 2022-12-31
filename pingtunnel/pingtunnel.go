@@ -6,7 +6,7 @@ import (
 	"github.com/cxjava/pingtunnel/loggo"
 	"github.com/golang/protobuf/proto"
 	"golang.org/x/net/icmp"
-	"golang.org/x/net/ipv4"
+	"golang.org/x/net/ipv6"
 	"net"
 	"sync"
 	"time"
@@ -47,7 +47,7 @@ func sendICMP(id int, sequence int, conn icmp.PacketConn, server *net.IPAddr, ta
 	}
 
 	msg := &icmp.Message{
-		Type: (ipv4.ICMPType)(sproto),
+		Type: (ipv6.ICMPType)(sproto),
 		Code: 0,
 		Body: body,
 	}
