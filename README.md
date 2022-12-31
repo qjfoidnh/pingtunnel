@@ -1,8 +1,9 @@
 # Pingtunnel-v6
 
-修改自[https://github.com/cxjava/pingtunnel][pingtunnel]
+修改自[pingtunnel](https://github.com/cxjava/pingtunnel)
 
 pingtunnel是把tcp/udp/sock5流量伪装成icmp流量进行转发的工具。用于突破网络封锁，或是绕过WIFI网络的登陆验证，或是在某些网络加快网络传输速度。
+
 pingtunnel-v6为原版pingtunnel的ipv6协议版本，不支持ipv4
 
 
