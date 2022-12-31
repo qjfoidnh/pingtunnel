@@ -227,7 +227,7 @@ func main() {
 				return true
 			}
 
-			taddr, err := net.ResolveTCPAddr("tcp", addr)
+			taddr, err := net.ResolveTCPAddr("tcp6", addr)
 			if err != nil {
 				return false
 			}
@@ -261,7 +261,7 @@ func main() {
 	}
 
 	if *profile > 0 {
-		go http.ListenAndServe("0.0.0.0:"+strconv.Itoa(*profile), nil)
+		go http.ListenAndServe("[0000:0000:0000:0000:0000:0000:0000:0000]:"+strconv.Itoa(*profile), nil)
 	}
 
 	for {
